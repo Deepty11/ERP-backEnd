@@ -1,0 +1,22 @@
+server:
+  port: 9000
+spring:
+  application:
+    name: ERPSpringBootBackEnd
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/erp_db
+    username: root
+    password: root1234
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    generate-ddl: true
+    show-sql: true
+    # table will not be created if `sql.init.mode` is set to `true` and
+    # `jpa.defer-datasource-initialization` is not added
+    defer-datasource-initialization: true
+  # To load data.sql
+  sql:
+    init:
+      mode: always
