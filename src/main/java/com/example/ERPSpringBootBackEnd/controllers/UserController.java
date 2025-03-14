@@ -7,9 +7,12 @@ import com.example.ERPSpringBootBackEnd.dto.responseDto.SuccessResponseDto;
 import com.example.ERPSpringBootBackEnd.enums.DBState;
 import com.example.ERPSpringBootBackEnd.model.Users;
 import com.example.ERPSpringBootBackEnd.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +24,17 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/user")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(
+        name="User Controller",
+        description = "Manages User CRUD operations")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping("/users")
     @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Get All Users", description = "Returns all user information")
     public ResponseEntity<List<UserDto>> getAllUser() {
         List<UserDto> users = userService.getAllUsers();
         return ResponseEntity.ok().body(users);
@@ -34,8 +42,8 @@ public class UserController {
 
     @PostMapping("/add-user")
     @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Create New User", description = "Create a new user")
     public ResponseEntity<?> createNewUser(@Valid @RequestBody UserDto userDto) {
-
         DBState state = userService.save(userDto);
 
         return state.equals(DBState.ALREADY_EXIST)
@@ -51,17 +59,20 @@ public class UserController {
     }
 
     @GetMapping("/loggedInUser")
+    @Operation(summary = "Get Logged in user", description = "Returns logged in user information")
     public ResponseEntity<UserDto> getLoggedInUser(@RequestParam String username) {
         return ResponseEntity.ok().body(userService.getUserDtoByUsername(username));
     }
 
     @GetMapping("/getUserDetails")
+    @Operation(summary = "Get user details by id", description = "Returns user details by given id")
     public ResponseEntity<?> getUserDetails(@RequestParam long id) {
         UserDto userDto = userService.getUserDetailsForId(id);
         return ResponseEntity.ok().body(userDto);
     }
 
     @PostMapping("/update")
+    @Operation(summary = "Update user details", description = "Update user details for given id and userDto")
     public ResponseEntity<?> updateUserDetails(@RequestParam long id,
                                                @RequestBody UserDto userDto) {
         Users updatedUsersDetails = userService.updateUserDetailsForId(id, userDto);
@@ -82,6 +93,7 @@ public class UserController {
 
     @DeleteMapping("/delete")
     @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Delete user by id", description = "Deletes user by id")
     public ResponseEntity<?> deleteById(@RequestParam long id) {
         try {
             userService.deleteUserById(id);
@@ -101,6 +113,7 @@ public class UserController {
 
     @PostMapping("/upload/profile-picture")
     @RolesAllowed({"ADMIN", "USER"})
+    @Operation(summary = "Upload profile picture", description = "Upload profile picture for  a given user id")
     public ResponseEntity<?> uploadProfilePicture(@RequestParam long id, @RequestBody FileEntityDto fileEntityDto) throws IOException {
         UserDto userDto = userService.uploadProfilePicture(id, fileEntityDto);
         if(Objects.nonNull(userDto)) {
@@ -114,6 +127,4 @@ public class UserController {
                         new Date().getTime(),
                         null));
     }
-
-
 }
