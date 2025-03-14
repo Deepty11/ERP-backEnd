@@ -5,7 +5,6 @@ import com.example.ERPSpringBootBackEnd.dto.requestDto.*;
 import com.example.ERPSpringBootBackEnd.enums.DBState;
 import com.example.ERPSpringBootBackEnd.enums.Gender;
 import com.example.ERPSpringBootBackEnd.enums.Religion;
-import com.example.ERPSpringBootBackEnd.mapper.ContactInfoMapper;
 import com.example.ERPSpringBootBackEnd.mapper.UserMapper;
 import com.example.ERPSpringBootBackEnd.model.*;
 import com.example.ERPSpringBootBackEnd.repositories.FileEntityRepository;
@@ -19,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -52,62 +50,62 @@ public class UserService implements UserDetailsService {
             return DBState.ALREADY_EXIST;
         }
 
-        User user = UserMapper.toUser(userDto);
+        Users users = UserMapper.toUser(userDto);
 
         if (userDto.getContactInfoDto() != null) {
-            user.setContactInfo(contactInfoService.save(userDto.getContactInfoDto()));
+            users.setContactInfo(contactInfoService.save(userDto.getContactInfoDto()));
         }
 
         if (userDto.getJobProfileDto() != null) {
             JobProfile jobProfile = jobProfileService.save(userDto.getJobProfileDto());
-            user.setJobProfile(jobProfile);
+            users.setJobProfile(jobProfile);
         }
 
-        userRepository.save(user);
+        userRepository.save(users);
         return DBState.SAVED;
     }
 
     public List<UserDto> getAllUsers() {
-        List<User> users = userRepository.findAll();
+        List<Users> users = userRepository.findAll();
         return UserMapper.toListOfUserDto(users);
     }
 
-    public User getUserById(long id) {
+    public Users getUserById(long id) {
         return userRepository.findById(id)
                 .orElse(null);
     }
 
-    public User getUserByUsername(String username) {
+    public Users getUserByUsername(String username) {
         return userRepository.findUserByUserName(username).get();
     }
 
     public UserDto getUserDtoByUsername(String username) {
-        User user = getUserByUsername(username);
-        return Objects.isNull(user) ? null : new UserDto(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getUsername(),
-                user.getRole().toString());
+        Users users = getUserByUsername(username);
+        return Objects.isNull(users) ? null : new UserDto(
+                users.getId(),
+                users.getFirstName(),
+                users.getLastName(),
+                users.getUsername(),
+                users.getRole().toString());
     }
 
     public UserDto getUserDetailsForId(long id) {
-        User user = userRepository.findById(id).orElse(null);
-        return UserMapper.toUserDto(user);
+        Users users = userRepository.findById(id).orElse(null);
+        return UserMapper.toUserDto(users);
     }
 
-    public User updateUserDetailsForId(long id, UserDto userDto) {
-        User userFromDB = getUserById(id);
-        if(Objects.isNull(userFromDB)) {
+    public Users updateUserDetailsForId(long id, UserDto userDto) {
+        Users usersFromDB = getUserById(id);
+        if(Objects.isNull(usersFromDB)) {
             return null;
         }
 
-        userFromDB.setFirstName(userDto.getFirstName());
-        userFromDB.setLastName(userDto.getLastName());
-        userFromDB.setGender(Gender.getGender(userDto.getGender()));
-        userFromDB.setReligion(Religion.getReligion(userDto.getReligion()));
+        usersFromDB.setFirstName(userDto.getFirstName());
+        usersFromDB.setLastName(userDto.getLastName());
+        usersFromDB.setGender(Gender.getGender(userDto.getGender()));
+        usersFromDB.setReligion(Religion.getReligion(userDto.getReligion()));
         if(StringUtil.notNullNorEmpty(userDto.getBirthDate())) {
-            userFromDB.setBirthDate(DateUtils.parseDate(userDto.getBirthDate()));
+            usersFromDB.setBirthDate(DateUtils.parseDate(userDto.getBirthDate()));
         }
 
         // update contactInfo
@@ -115,17 +113,17 @@ public class UserService implements UserDetailsService {
             ContactInfoDto contactInfoDto = userDto.getContactInfoDto();
 
             ContactInfo contactInfo = null;
-            if(Objects.isNull(userFromDB.getContactInfo())) {
+            if(Objects.isNull(usersFromDB.getContactInfo())) {
                 contactInfo = contactInfoService.save(contactInfoDto);
             } else {
-                contactInfo = contactInfoService.update(userFromDB.getContactInfo().getId(), contactInfoDto);
+                contactInfo = contactInfoService.update(usersFromDB.getContactInfo().getId(), contactInfoDto);
             }
 
             if(Objects.isNull(contactInfo)) {
                 return null;
             }
 
-            userFromDB.setContactInfo(contactInfo);
+            usersFromDB.setContactInfo(contactInfo);
         }
 
         // update emergencyContactInfo
@@ -133,17 +131,17 @@ public class UserService implements UserDetailsService {
             EmergencyContactInfoDto emergencyContactInfoDto = userDto.getEmergencyContactInfoDto();
 
             EmergencyContactInfo emergencyContactInfo = null;
-            if(Objects.isNull(userFromDB.getEmergencyContact())) {
+            if(Objects.isNull(usersFromDB.getEmergencyContact())) {
                 emergencyContactInfo = emergencyContactInfoService.save(emergencyContactInfoDto);
             } else {
-                emergencyContactInfo = emergencyContactInfoService.update(userFromDB.getEmergencyContact().getId(), emergencyContactInfoDto);
+                emergencyContactInfo = emergencyContactInfoService.update(usersFromDB.getEmergencyContact().getId(), emergencyContactInfoDto);
             }
 
             if(Objects.isNull(emergencyContactInfo)) {
                 return null;
             }
 
-            userFromDB.setEmergencyContact(emergencyContactInfo);
+            usersFromDB.setEmergencyContact(emergencyContactInfo);
         }
 
         // update jobProfile
@@ -151,21 +149,21 @@ public class UserService implements UserDetailsService {
             JobProfileDto jobProfileDto = userDto.getJobProfileDto();
 
             JobProfile jobProfile = null;
-            if(Objects.isNull(userFromDB.getEmergencyContact())) {
+            if(Objects.isNull(usersFromDB.getEmergencyContact())) {
                 jobProfile = jobProfileService.save(jobProfileDto);
             } else {
-                jobProfile = jobProfileService.update(userFromDB.getJobProfile().getId(), jobProfileDto);
+                jobProfile = jobProfileService.update(usersFromDB.getJobProfile().getId(), jobProfileDto);
             }
 
             if(Objects.isNull(jobProfile)) {
                 return null;
             }
 
-            userFromDB.setJobProfile(jobProfile);
+            usersFromDB.setJobProfile(jobProfile);
         }
 
-        userFromDB.setId(id);
-        return userRepository.save(userFromDB);
+        usersFromDB.setId(id);
+        return userRepository.save(usersFromDB);
     }
 
     public void deleteUserById(long id) {
@@ -176,44 +174,44 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public User getCurrentUser() {
+    public Users getCurrentUser() {
         Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String username = (String) principle;
         return getUserByUsername(username);
     }
 
-    public List<User> getAllUsersByIds(List<Long> ids) {
+    public List<Users> getAllUsersByIds(List<Long> ids) {
         return userRepository.findAllById(ids);
     }
 
     public UserDto uploadProfilePicture(long id, FileEntityDto fileEntityDto) throws IOException {
-        Optional<User> optional = userRepository.findById(id);
+        Optional<Users> optional = userRepository.findById(id);
 
         if(optional.isEmpty()) {
             return null;
         }
 
-        User userFromDB = optional.get();
+        Users usersFromDB = optional.get();
 
-        if(Objects.nonNull(userFromDB.getProfilePicture())) {
-           FileEntity fileEntityFromDB = userFromDB.getProfilePicture();
+        if(Objects.nonNull(usersFromDB.getProfilePicture())) {
+           FileEntity fileEntityFromDB = usersFromDB.getProfilePicture();
            fileEntityFromDB.setFileName(fileEntityDto.getFileName());
            fileEntityFromDB.setDocument(Base64.getDecoder().decode(fileEntityDto.getData()));
            fileEntityRepository.save(fileEntityFromDB);
-           userFromDB.setProfilePicture(fileEntityFromDB);
+           usersFromDB.setProfilePicture(fileEntityFromDB);
 
         } else {
             FileEntity newProfilePicture = new FileEntity();
             newProfilePicture.setFileName(fileEntityDto.getFileName());
             newProfilePicture.setDocument(Base64.getDecoder().decode(fileEntityDto.getData()));
             fileEntityRepository.save(newProfilePicture);
-            userFromDB.setProfilePicture(newProfilePicture);
+            usersFromDB.setProfilePicture(newProfilePicture);
         }
 
-        User user = userRepository.save(userFromDB);
+        Users users = userRepository.save(usersFromDB);
 
-        return UserMapper.toUserDto(user);
+        return UserMapper.toUserDto(users);
     }
 
     @Override

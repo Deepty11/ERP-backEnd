@@ -24,7 +24,7 @@ public class LoginController {
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) throws AuthenticationFailedException {
         String token = authenticationService.authenticate(request.getUsername(), request.getPassword());
         return Objects.isNull(token)
-                ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ? ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ErrorResponseDto(
                         "Invalid Username or password",
                         new Date().getTime(),

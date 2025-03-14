@@ -17,11 +17,6 @@ public enum LeaveType {
         this.title = title;
     }
 
-//    @Override
-//    public String toString() {
-//        return this.title;
-//    }
-
     public static List<String> getLeaveTypeList() {
         List<String> leaveTypeList = new ArrayList<>();
         for (LeaveType l : LeaveType.values()) {

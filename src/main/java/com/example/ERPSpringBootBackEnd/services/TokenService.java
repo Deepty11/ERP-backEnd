@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.ERPSpringBootBackEnd.model.User;
+import com.example.ERPSpringBootBackEnd.model.Users;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -32,13 +32,13 @@ public class TokenService {
         return decodedJWT.getSubject();
     }
 
-    public String generateToken(User user) {
+    public String generateToken(Users users) {
         Algorithm algorithm = Algorithm.HMAC256(secret.getBytes());
         Instant expiration = generateExpirationTimeIn(10);
         String token = JWT.create()
-                .withSubject(user.getUsername())
+                .withSubject(users.getUsername())
                 .withExpiresAt(expiration)
-                .withClaim("roles", user.getRole().name())
+                .withClaim("roles", users.getRole().name())
                 .sign(algorithm);
         return token;
     }

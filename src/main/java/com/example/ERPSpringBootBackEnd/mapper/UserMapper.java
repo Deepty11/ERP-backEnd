@@ -5,7 +5,7 @@ import com.example.ERPSpringBootBackEnd.dto.requestDto.UserDto;
 import com.example.ERPSpringBootBackEnd.enums.Gender;
 import com.example.ERPSpringBootBackEnd.enums.Religion;
 import com.example.ERPSpringBootBackEnd.enums.Role;
-import com.example.ERPSpringBootBackEnd.model.User;
+import com.example.ERPSpringBootBackEnd.model.Users;
 import com.example.ERPSpringBootBackEnd.utils.DateUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -15,70 +15,70 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class UserMapper {
-    public static User toUser(UserDto userDto) {
-        User user = new User();
-        user.setUserName(userDto.getUsername());
+    public static Users toUser(UserDto userDto) {
+        Users users = new Users();
+        users.setUserName(userDto.getUsername());
         if(!Objects.isNull(userDto.getPassword())) {
-            user.setPassword(new BCryptPasswordEncoder().encode(userDto.getPassword()));
+            users.setPassword(new BCryptPasswordEncoder().encode(userDto.getPassword()));
         }
 
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setGender(Gender.getGender(userDto.getGender()));
-        user.setReligion(Religion.getReligion(userDto.getReligion()));
-        user.setRole(Role.getRole(userDto.getRole()));
+        users.setFirstName(userDto.getFirstName());
+        users.setLastName(userDto.getLastName());
+        users.setGender(Gender.getGender(userDto.getGender()));
+        users.setReligion(Religion.getReligion(userDto.getReligion()));
+        users.setRole(Role.getRole(userDto.getRole()));
 
         if (StringUtil.notNullNorEmpty(userDto.getBirthDate())) {
             System.out.println("Birthdate: " + userDto.getBirthDate());
             try {
-                user.setBirthDate(DateUtils.convertToDate(userDto.getBirthDate()));
+                users.setBirthDate(DateUtils.convertToDate(userDto.getBirthDate()));
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
         }
 
         if(!Objects.isNull(userDto.getContactInfoDto())) {
-            user.setContactInfo(ContactInfoMapper.toContactInfo(userDto.getContactInfoDto()));
+            users.setContactInfo(ContactInfoMapper.toContactInfo(userDto.getContactInfoDto()));
         }
 
         if(!Objects.isNull(userDto.getJobProfileDto())) {
-            user.setJobProfile(JobProfileMapper.toJobProfile(userDto.getJobProfileDto()));
+            users.setJobProfile(JobProfileMapper.toJobProfile(userDto.getJobProfileDto()));
         }
 
         if(!Objects.isNull(userDto.getEmergencyContactInfoDto())) {
-            user.setEmergencyContact(EmergencyContactInfoMapper.toEmergencyContactInfo(userDto.getEmergencyContactInfoDto()));
+            users.setEmergencyContact(EmergencyContactInfoMapper.toEmergencyContactInfo(userDto.getEmergencyContactInfoDto()));
         }
 
         if(!Objects.isNull(userDto.getLeaveApplicationDtos())) {
-            user.setLeaveApplications(
+            users.setLeaveApplications(
                     LeaveApplicationMapper.toListOfLeaveApplication(
                             userDto.getLeaveApplicationDtos()));
         }
 
-        return user;
+        return users;
     }
 
-    public static UserDto toUserDto(User user) {
-        return Objects.isNull(user)
+    public static UserDto toUserDto(Users users) {
+        return Objects.isNull(users)
                 ? null
                 : UserDto.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .fullName(user.getFullName())
-                .username(user.getUsername())
-                .role(user.getRole().name())
-                .birthDate(Objects.isNull(user.getBirthDate()) ? null : DateUtils.formatDate(user.getBirthDate()))
-                .gender(Objects.isNull(user.getGender()) ? null : user.getGender().name())
-                .religion(Objects.isNull(user.getReligion()) ? null :user.getReligion().name())
-                .jobProfileDto(Objects.isNull(user.getJobProfile()) ? null : JobProfileMapper.toDto(user.getJobProfile()))
-                .contactInfoDto(Objects.isNull(user.getContactInfo()) ? null :ContactInfoMapper.toDto(user.getContactInfo()))
-                .emergencyContactInfoDto(Objects.isNull(user.getEmergencyContact()) ? null :EmergencyContactInfoMapper.toDto(user.getEmergencyContact()))
-                .leaveApplicationDtos(LeaveApplicationMapper.toListOfLeaveApplicationDto(user.getLeaveApplications()))
-                .fileEntityDto(FileEntityMapper.toFileEntityDto(user.getProfilePicture()))
+                .firstName(users.getFirstName())
+                .lastName(users.getLastName())
+                .fullName(users.getFullName())
+                .username(users.getUsername())
+                .role(users.getRole().name())
+                .birthDate(Objects.isNull(users.getBirthDate()) ? null : DateUtils.formatDate(users.getBirthDate()))
+                .gender(Objects.isNull(users.getGender()) ? null : users.getGender().name())
+                .religion(Objects.isNull(users.getReligion()) ? null : users.getReligion().name())
+                .jobProfileDto(Objects.isNull(users.getJobProfile()) ? null : JobProfileMapper.toDto(users.getJobProfile()))
+                .contactInfoDto(Objects.isNull(users.getContactInfo()) ? null :ContactInfoMapper.toDto(users.getContactInfo()))
+                .emergencyContactInfoDto(Objects.isNull(users.getEmergencyContact()) ? null :EmergencyContactInfoMapper.toDto(users.getEmergencyContact()))
+                .leaveApplicationDtos(LeaveApplicationMapper.toListOfLeaveApplicationDto(users.getLeaveApplications()))
+                .fileEntityDto(FileEntityMapper.toFileEntityDto(users.getProfilePicture()))
                 .build();
     }
 
-    public static List<UserDto> toListOfUserDto(List<User> users) {
+    public static List<UserDto> toListOfUserDto(List<Users> users) {
         return users
                 .stream()
                 .map(user -> new UserDto(

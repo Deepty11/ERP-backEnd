@@ -1,7 +1,5 @@
 package com.example.ERPSpringBootBackEnd.configuration;
 import com.example.ERPSpringBootBackEnd.dto.requestDto.*;
-import com.example.ERPSpringBootBackEnd.mapper.DesignationMapper;
-import com.example.ERPSpringBootBackEnd.model.User;
 import com.example.ERPSpringBootBackEnd.services.DesignationService;
 import com.example.ERPSpringBootBackEnd.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 public class Config {

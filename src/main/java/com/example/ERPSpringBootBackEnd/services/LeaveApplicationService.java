@@ -3,12 +3,14 @@ package com.example.ERPSpringBootBackEnd.services;
 import com.example.ERPSpringBootBackEnd.dto.requestDto.LeaveApplicationDto;
 import com.example.ERPSpringBootBackEnd.enums.LeaveStatus;
 import com.example.ERPSpringBootBackEnd.enums.LeaveType;
+import com.example.ERPSpringBootBackEnd.exception.APIException;
 import com.example.ERPSpringBootBackEnd.model.LeaveApplication;
-import com.example.ERPSpringBootBackEnd.model.User;
+import com.example.ERPSpringBootBackEnd.model.Users;
 import com.example.ERPSpringBootBackEnd.repositories.LeaveApplicationRepository;
 import com.example.ERPSpringBootBackEnd.utils.DateUtils;
 import com.example.ERPSpringBootBackEnd.mapper.LeaveApplicationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,14 +25,14 @@ public class LeaveApplicationService {
     @Autowired
     private UserService userService;
 
-    public int totalAllowedSickLeaves = 3;
-    public int totalAllowedCasualLeaves = 14;
+    public final int ALLOWED_SICK_LEAVE = 3;
+    public final int ALLOWED_CASUAL_LEAVE = 14;
 
     public LeaveApplication save(LeaveApplicationDto leaveApplicationDto) {
-        User user = userService.getUserByUsername(
+        Users users = userService.getUserByUsername(
                 leaveApplicationDto.getUserDto().getUsername());
 
-        if (Objects.isNull(user)) {
+        if (Objects.isNull(users)) {
             return null;
         }
 
@@ -41,7 +43,7 @@ public class LeaveApplicationService {
                 .fromDate(DateUtils.parseDate(leaveApplicationDto.getFromDate()))
                 .toDate(DateUtils.parseDate(leaveApplicationDto.getToDate()))
                 .status(LeaveStatus.getLeaveStatus(leaveApplicationDto.getStatus()))
-                .user(user)
+                .users(users)
                 .build();
         return saveLeaveApplication(leaveApplication);
     }
@@ -63,13 +65,19 @@ public class LeaveApplicationService {
     }
 
     public List<LeaveApplicationDto> getAllLeaves(long userId, LeaveType leaveType) {
-        List<LeaveApplicationDto> leaves = getApplicationsByUserId(userId);
-        return leaves
-                .stream()
-                .filter((leaveApplicationDto ->
-                        leaveApplicationDto.getLeaveType().equals(leaveType.getTitle())
-                ))
-                .toList();
+        Users user = userService.getUserById(userId);
+        if (Objects.isNull(user)) {
+            throw new APIException("No user Found", HttpStatus.NOT_FOUND.value());
+        }
+
+        System.out.println(leaveType.toString());
+
+        List<LeaveApplication> casualLeaveApplications = repository.findByUsersAndLeaveType(user, leaveType);
+        if (Objects.isNull(casualLeaveApplications)) {
+            throw new APIException("No Casual Leave For this User", HttpStatus.NOT_FOUND.value());
+        }
+
+        return LeaveApplicationMapper.toListOfLeaveApplicationDto(casualLeaveApplications);
     }
 
     public int getNumberOfLeaves(List<LeaveApplicationDto> leaveApplicationDtos) {
@@ -77,19 +85,27 @@ public class LeaveApplicationService {
     }
 
     public int getRemainingSickLeaves(long userId) {
-        return totalAllowedSickLeaves - getNumberOfLeaves(getAllSickLeavesByUserId(userId));
+        return ALLOWED_SICK_LEAVE - getNumberOfLeaves(getAllSickLeavesByUserId(userId));
     }
 
     public int getRemainingCasualLeaves(long userId) {
-        return totalAllowedCasualLeaves - getNumberOfLeaves(getAllCasualLeavesByUserId(userId));
+        return ALLOWED_CASUAL_LEAVE - getNumberOfLeaves(getAllCasualLeavesByUserId(userId));
     }
 
     public List<LeaveApplicationDto> getApplicationsByUserId(long userId) {
-        List<LeaveApplicationDto> allLeavesDto = getAllLeaveApplication();
-        return allLeavesDto.stream().filter((leaveApplicationDto ->
-                        leaveApplicationDto.getUserDto().getId() == userId
-                ))
-                .toList();
+        Users user = userService.getUserById(userId);
+
+        if (Objects.isNull(user)) {
+            throw new APIException("No User Found", HttpStatus.NOT_FOUND.value());
+        }
+
+        List<LeaveApplication> leaveApplications = repository.findByUsers(user);
+
+        if (Objects.isNull(leaveApplications)) {
+            throw new APIException("No Leave Application Found for this user", HttpStatus.NOT_FOUND.value());
+        }
+
+        return LeaveApplicationMapper.toListOfLeaveApplicationDto(leaveApplications);
     }
 
     public Optional<LeaveApplication> getLeaveApplicationById(long id) {

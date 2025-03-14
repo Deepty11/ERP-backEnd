@@ -5,7 +5,7 @@ import com.example.ERPSpringBootBackEnd.dto.requestDto.UserDto;
 import com.example.ERPSpringBootBackEnd.dto.responseDto.ErrorResponseDto;
 import com.example.ERPSpringBootBackEnd.dto.responseDto.SuccessResponseDto;
 import com.example.ERPSpringBootBackEnd.enums.DBState;
-import com.example.ERPSpringBootBackEnd.model.User;
+import com.example.ERPSpringBootBackEnd.model.Users;
 import com.example.ERPSpringBootBackEnd.services.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
@@ -64,8 +64,8 @@ public class UserController {
     @PostMapping("/update")
     public ResponseEntity<?> updateUserDetails(@RequestParam long id,
                                                @RequestBody UserDto userDto) {
-        User updatedUserDetails = userService.updateUserDetailsForId(id, userDto);
-        if(Objects.isNull(updatedUserDetails)) {
+        Users updatedUsersDetails = userService.updateUserDetailsForId(id, userDto);
+        if(Objects.isNull(updatedUsersDetails)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ErrorResponseDto(
                             "User not available",

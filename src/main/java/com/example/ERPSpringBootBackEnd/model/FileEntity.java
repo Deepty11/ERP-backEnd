@@ -28,7 +28,7 @@ public class FileEntity implements Serializable {
     private byte[] document;
 
     @OneToOne
-    private User user;
+    private Users users;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

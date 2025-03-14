@@ -1,8 +1,8 @@
 package com.example.ERPSpringBootBackEnd.controllers;
 
 import com.example.ERPSpringBootBackEnd.dto.requestDto.DesignationDto;
-import com.example.ERPSpringBootBackEnd.dto.responseDto.ErrorResponseDto;
 import com.example.ERPSpringBootBackEnd.dto.responseDto.SuccessResponseDto;
+import com.example.ERPSpringBootBackEnd.exception.APIException;
 import com.example.ERPSpringBootBackEnd.mapper.DesignationMapper;
 import com.example.ERPSpringBootBackEnd.model.Designation;
 import com.example.ERPSpringBootBackEnd.services.DesignationService;
@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +26,6 @@ public class DesignationController {
     @PostMapping("/add-designation")
     @RolesAllowed({"ADMIN"})
     public ResponseEntity<Designation> saveDesignation(@RequestBody DesignationDto designationDto) {
-        System.out.println("DesignationDTo: "+ designationDto);
         return ResponseEntity.ok().body(designationService.save(designationDto));
     }
 
@@ -42,14 +40,14 @@ public class DesignationController {
     public ResponseEntity<?> getDesignationById(@RequestParam long id) {
         Optional<Designation> optional = designationService.getDesignationBy(id);
         if(optional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new ErrorResponseDto(
-                            "No designation found with this id.",
-                            new Date().getTime(),
-                            null));
+            throw new APIException(
+                    "No designation found with this id.",
+                    HttpStatus.NOT_FOUND.value());
         }
 
-        return ResponseEntity.ok().body(DesignationMapper.toDto(optional.get()));
+        return ResponseEntity.ok()
+                .body(DesignationMapper
+                        .toDto(optional.get()));
     }
 
     @PostMapping("/edit-designation")
@@ -59,11 +57,10 @@ public class DesignationController {
         Designation designation = designationService.update(id, designationDto);
 
         if(Objects.isNull(designation)) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponseDto("No designation found with this id",
-                            new Date().getTime(),
-                            null));
+            throw new APIException(
+                    "No designation found with this id",
+                    HttpStatus.NOT_FOUND.value()
+            );
         }
 
         return ResponseEntity

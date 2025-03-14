@@ -23,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class User implements UserDetails, Serializable {
+public class Users implements UserDetails, Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,7 +65,7 @@ public class User implements UserDetails, Serializable {
     @JoinColumn(name = "job_info_id")
     private JobProfile jobProfile;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "users")
     private List<LeaveApplication> leaveApplications;
 
     @Transient

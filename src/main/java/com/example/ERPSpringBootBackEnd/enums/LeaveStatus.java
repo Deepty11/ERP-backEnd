@@ -8,7 +8,8 @@ import java.util.Arrays;
 public enum LeaveStatus {
     APPROVED("Approved"),
     DECLINED("Declined"),
-    PENDING("Pending");
+    PENDING("Pending"),
+    DELETED("Deleted");
 
     String title;
 

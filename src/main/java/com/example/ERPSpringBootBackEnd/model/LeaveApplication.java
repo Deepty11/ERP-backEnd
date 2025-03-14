@@ -48,7 +48,7 @@ public class LeaveApplication implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users users;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

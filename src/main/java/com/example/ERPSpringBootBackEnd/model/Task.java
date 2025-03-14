@@ -1,6 +1,5 @@
 package com.example.ERPSpringBootBackEnd.model;
 
-import com.example.ERPSpringBootBackEnd.dto.requestDto.UserDto;
 import com.example.ERPSpringBootBackEnd.enums.TaskPriority;
 import com.example.ERPSpringBootBackEnd.enums.TaskStatus;
 import jakarta.persistence.*;
@@ -39,14 +38,14 @@ public class Task implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "reporter_id", nullable = false)
-    private User reportedBy;
+    private Users reportedBy;
 
     @ManyToMany
     @JoinTable(
             name = "task_assignees",
             joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> assignees;
+    private List<Users> assignees;
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status;

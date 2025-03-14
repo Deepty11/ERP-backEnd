@@ -1,7 +1,6 @@
 package com.example.ERPSpringBootBackEnd.services;
 
-import com.example.ERPSpringBootBackEnd.exception.AuthenticationFailedException;
-import com.example.ERPSpringBootBackEnd.model.User;
+import com.example.ERPSpringBootBackEnd.model.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,10 +22,12 @@ public class AuthenticationService {
             System.out.println("Username: " + username);
             System.out.println("Password: " + password);
             Authentication authentication = authenticationManager.authenticate(authToken);
-            var user = (User)authentication.getPrincipal();
+            var user = (Users)authentication.getPrincipal();
             String token = tokenService.generateToken(user);
+
             return token;
         } catch(AuthenticationException e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }

@@ -8,7 +8,7 @@ import com.example.ERPSpringBootBackEnd.enums.TaskStatus;
 import com.example.ERPSpringBootBackEnd.mapper.TaskMapper;
 import com.example.ERPSpringBootBackEnd.mapper.UserMapper;
 import com.example.ERPSpringBootBackEnd.model.Task;
-import com.example.ERPSpringBootBackEnd.model.User;
+import com.example.ERPSpringBootBackEnd.model.Users;
 import com.example.ERPSpringBootBackEnd.repositories.TaskRepository;
 import com.example.ERPSpringBootBackEnd.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    private List<User> getUsers(List<UserDto> userDtoList) {
+    private List<Users> getUsers(List<UserDto> userDtoList) {
         if(userDtoList.isEmpty()) {
             return null;
         }
@@ -73,8 +73,8 @@ public class TaskService {
             taskDto.setReportedBy(UserMapper.toUserDto(userService.getUserById(task.getReportedBy().getId())));
         } else {
             // set reported By to the logged in user
-            User currentUser = userService.getCurrentUser();
-            taskDto.setReportedBy(UserMapper.toUserDto(currentUser));
+            Users currentUsers = userService.getCurrentUser();
+            taskDto.setReportedBy(UserMapper.toUserDto(currentUsers));
         }
 
         if(Objects.nonNull(task.getAssignees())) {
