@@ -63,7 +63,11 @@ public class UserDto {
         this.role = role;
     }
 
-    public UserDto(long id, String firstName, String lastName, String username, String role) {
+    public UserDto(long id,
+                   String firstName,
+                   String lastName,
+                   String username,
+                   String role) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -75,7 +79,10 @@ public class UserDto {
     /**
      * To fetch user List from DB and to pass to react
      */
-    public UserDto(String firstName, String lastName, String username, String role) {
+    public UserDto(String firstName,
+                   String lastName,
+                   String username,
+                   String role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
