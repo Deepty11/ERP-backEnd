@@ -5,6 +5,9 @@ import com.example.ERPSpringBootBackEnd.dto.requestDto.AuthenticationResponse;
 import com.example.ERPSpringBootBackEnd.dto.responseDto.ErrorResponseDto;
 import com.example.ERPSpringBootBackEnd.exception.AuthenticationFailedException;
 import com.example.ERPSpringBootBackEnd.services.AuthenticationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +19,13 @@ import java.util.Date;
 import java.util.Objects;
 
 @RestController
+@RequiredArgsConstructor
+@Tag(name = "Login Controller", description = "Manages Login operations")
 public class LoginController {
-    @Autowired
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
+    @Operation(summary ="Login", description = "Operates login with authentication requests")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) throws AuthenticationFailedException {
         String token = authenticationService.authenticate(request.getUsername(), request.getPassword());
         return Objects.isNull(token)

@@ -6,8 +6,11 @@ import com.example.ERPSpringBootBackEnd.exception.APIException;
 import com.example.ERPSpringBootBackEnd.mapper.DesignationMapper;
 import com.example.ERPSpringBootBackEnd.model.Designation;
 import com.example.ERPSpringBootBackEnd.services.DesignationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,24 +22,31 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/designation")
+@SecurityRequirement(name = "bearerAuth")
+@RequiredArgsConstructor
+@Tag(
+        name = "DesignationController",
+        description = "Manages Designations CRUD operations")
 public class DesignationController {
-    @Autowired
-    private DesignationService designationService;
+    private final DesignationService designationService;
 
     @PostMapping("/add-designation")
     @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Save Designation", description = "Saves new designation")
     public ResponseEntity<Designation> saveDesignation(@RequestBody DesignationDto designationDto) {
         return ResponseEntity.ok().body(designationService.save(designationDto));
     }
 
     @GetMapping("/designations")
     @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Get All designations", description = "Returns all designation information")
     public ResponseEntity<List<DesignationDto>> getDesignationList() {
         return ResponseEntity.ok().body(designationService.getAllDesignations());
     }
 
     @GetMapping("/designation-details")
     @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Get All designations", description = "Returns all user information")
     public ResponseEntity<?> getDesignationById(@RequestParam long id) {
         Optional<Designation> optional = designationService.getDesignationBy(id);
         if(optional.isEmpty()) {
@@ -52,6 +62,7 @@ public class DesignationController {
 
     @PostMapping("/edit-designation")
     @RolesAllowed({"ADMIN"})
+    @Operation(summary = "Update designation by id", description = "Update designation for given designation id")
     public ResponseEntity<?> updateDesignationById(@RequestParam long id,
                                                    @RequestBody DesignationDto designationDto) {
         Designation designation = designationService.update(id, designationDto);

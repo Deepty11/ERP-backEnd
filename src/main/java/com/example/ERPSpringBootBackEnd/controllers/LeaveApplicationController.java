@@ -7,8 +7,11 @@ import com.example.ERPSpringBootBackEnd.enums.LeaveType;
 import com.example.ERPSpringBootBackEnd.exception.APIException;
 import com.example.ERPSpringBootBackEnd.model.LeaveApplication;
 import com.example.ERPSpringBootBackEnd.services.LeaveApplicationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +22,18 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/leave")
+@SecurityRequirement(name = "bearerAuth")
+@RequiredArgsConstructor
+@Tag(name = "Leave Applications",
+        description = "Manages leave application CRUD operations")
 public class LeaveApplicationController {
-    @Autowired
-    private LeaveApplicationService service;
+    private final LeaveApplicationService service;
 
     @PostMapping("/create-application")
     @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            summary = "Save new application",
+            description = "Saves new leave application")
     public ResponseEntity<LeaveApplication> save(@RequestBody LeaveApplicationDto leaveApplicationDto) {
        LeaveApplication leaveApplication = service.save(leaveApplicationDto);
 
@@ -37,18 +46,27 @@ public class LeaveApplicationController {
 
     @GetMapping("/leave-applications")
     @RolesAllowed({"ADMIN"})
+    @Operation(
+            summary = "Get All leave appplications",
+            description = "Returns all leave Applications")
     public  ResponseEntity<List<LeaveApplicationDto>> getAllLeaveApplications() {
         return ResponseEntity.ok().body(service.getAllLeaveApplication());
     }
 
     @GetMapping("/my-leave-applications")
     @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            summary = "Get All leave applications by user id",
+            description = "Returns all leave applications for a given user id")
     public  ResponseEntity<List<LeaveApplicationDto>> getAllApplicationsByUserId(@RequestParam long userId) {
         return ResponseEntity.ok().body(service.getApplicationsByUserId(userId));
     }
 
     @GetMapping("/overview")
     @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            summary = "Get leave overviews",
+            description = "Returns leave overviews")
     public ResponseEntity<LeaveOverviewDto> getLeaveOverview(@RequestParam long userId) {
         LeaveOverviewDto leaveOverviewDto = new LeaveOverviewDto(
                 userId,
@@ -65,6 +83,9 @@ public class LeaveApplicationController {
 
     @GetMapping("/action")
     @RolesAllowed({"ADMIN"})
+    @Operation(
+            summary = "Leave application action",
+            description = "Updates leave application for a given leaveId and specified action")
     public ResponseEntity<String> action(
             @RequestParam long leaveId,
             @RequestParam String action) {

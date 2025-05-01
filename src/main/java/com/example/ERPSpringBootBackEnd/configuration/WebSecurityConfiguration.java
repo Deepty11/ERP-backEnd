@@ -33,12 +33,15 @@ import java.util.Arrays;
         jsr250Enabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
-    @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private JWTAuthenticationFilter jwtAuthenticationFilter;
-    @Autowired
-    private UserService userService;
+    private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final UserService userService;
+    private final String[] AUTH_WHITELIST = {
+            "/",
+            "/login",
+            "/v3/api-docs/**",
+            "/swagger-ui/*/**",
+            "/swagger-ui.html",
+    };
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -66,8 +69,7 @@ public class WebSecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -87,6 +89,4 @@ public class WebSecurityConfiguration {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
-
 }
